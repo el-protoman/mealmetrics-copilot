@@ -13,6 +13,9 @@ function Header() {
         <Typography variant="h6" style={{ flexGrow: 1 }}>
           MealMetrics 🍎
         </Typography>
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          MealCreator 🍎
+        </Typography>
         <IconButton edge="end" color="inherit">
           <img src="/logo.png" alt="Logo" style={{ height: "40px" }} />
         </IconButton>

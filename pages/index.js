@@ -43,16 +43,20 @@ import theme from "../utils/theme";
 
 function HomePage() {
   const [recipe, setRecipe] = useState("");
-  const [nutrition, setNutrition] = useState("");
+  const [gptResponse, setGPTResponse] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0); // Track the selected tab index
 
-  async function handleSubmit(event) {
-    event.preventDefault();
-    setLoading(true);
+  const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+    setRecipe("")
+  };
+
+  async function getRecipeNutrition() {
     try {
       const response = await fetch(
-        "http://localhost:8080/openai/generateinfo",
+        "http://localhost:8080/openai/generateinfo/recipe",
         {
           method: "POST",
           headers: {
@@ -68,7 +72,7 @@ function HomePage() {
       // display nutrition info
       if (nutrition.data) {
         console.log(nutrition);
-        setNutrition(nutrition.data);
+        setGPTResponse(nutrition.data);
         setLoading(false);
       } else {
         setError("Unable to get nutrition info");
@@ -80,6 +84,49 @@ function HomePage() {
     }
   }
 
+  async function getMealRecipe() {
+    try {
+      const response = await fetch(
+        "http://localhost:8080/openai/generateinfo/meal",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ recipe }),
+        }
+      );
+
+      // get nutrition info
+      const recipe = await response.json();
+
+      // display recipe info
+      if (recipe.data) {
+        console.log(recipe);
+        setGPTResponse(recipe.data);
+        setLoading(false);
+      } else {
+        setError("Unable to get recipe info");
+        setLoading(false);
+      }
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setLoading(true);
+    if (selectedTab === 0) {
+      await getRecipeNutrition();
+    } else if (selectedTab === 1) {
+      await getMealRecipe();
+    } else if (selectedTab === 2) {
+      console.log("Please select tab"); //add additional endpoints here
+    }
+  }
+
   function handleClear(event) {
     event.preventDefault();
     setRecipe("");
@@ -87,65 +134,129 @@ function HomePage() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Header />
+      <Header selectedTab={selectedTab} handleTabChange={handleTabChange} />
       <Container maxWidth="md" style={{ marginTop: "40px", minHeight: "100vh", paddingBottom: "100px" }}>
-        <Typography variant="h3" gutterBottom>
-          🍎 Find Nutrition Facts for any recipe
-        </Typography>
-        <Paper elevation={24} style={{ padding: "20px" }}>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextareaAutosize
-                  value={recipe}
-                  onChange={(e) => setRecipe(e.target.value)}
-                  placeholder="Enter recipe to get nutrition facts"
-                  style={{
-                    width: "98%",
-                    maxWidth: "850px",
-                    minHeight: "200px",
-                    padding: "10px",
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  startIcon={<Send />}
-                >
-                  Submit
-                </Button>
-                <br />
-                <Button
-                  style={{ marginTop: "10px" }}
-                  variant="contained"
-                  color="secondary"
-                  onClick={handleClear}
-                >
-                  Clear
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Paper>
-        <div style={{ paddingTop: "40px" }}>
-          {loading && (
-            <Grid item xs={12}>
-              <CircularProgress />
-            </Grid>
-          )}
-          {error ? (
-            <Typography color="error">
-              An error occurred: {error.errorMessage}
+        {/* Display the content of the selected tab */}
+        {selectedTab === 0 && (
+          <div>
+            <Typography variant="h3" gutterBottom>
+              🍎 Find Nutrition Facts for any recipe
             </Typography>
-          ) : nutrition ? (
-            <NutritionFacts data={nutrition} />
-          ) : null}
-        </div>
+            <Paper elevation={24} style={{ padding: "20px" }}>
+              <form onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextareaAutosize
+                      value={recipe}
+                      onChange={(e) => setRecipe(e.target.value)}
+                      placeholder="Enter recipe to get nutrition facts"
+                      style={{
+                        width: "98%",
+                        maxWidth: "850px",
+                        minHeight: "200px",
+                        padding: "10px",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      startIcon={<Send />}
+                    >
+                      Submit
+                    </Button>
+                    <br />
+                    <Button
+                      style={{ marginTop: "10px" }}
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleClear}
+                    >
+                      Clear
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </Paper>
+            <div style={{ paddingTop: "40px" }}>
+              {loading && (
+                <Grid item xs={12}>
+                  <CircularProgress />
+                </Grid>
+              )}
+              {error ? (
+                <Typography color="error">
+                  An error occurred: {error.errorMessage}
+                </Typography>
+              ) : gptResponse ? (
+                <NutritionFacts data={gptResponse} tabIndex={selectedTab} />
+              ) : null}
+            </div>
+          </div>
+        )}
+        {selectedTab === 1 && (
+          <div>
+            <Typography variant="h3" gutterBottom>
+              🍎 Create a Meal
+            </Typography>
+            <Paper elevation={24} style={{ padding: "20px" }}>
+              <form onSubmit={handleSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextareaAutosize
+                      value={recipe}
+                      onChange={(e) => setRecipe(e.target.value)}
+                      placeholder="Enter ingredients to get a recipe suggestion"
+                      style={{
+                        width: "98%",
+                        maxWidth: "850px",
+                        minHeight: "200px",
+                        padding: "10px",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      startIcon={<Send />}
+                    >
+                      Submit
+                    </Button>
+                    <br />
+                    <Button
+                      style={{ marginTop: "10px" }}
+                      variant="contained"
+                      color="secondary"
+                      onClick={handleClear}
+                    >
+                      Clear
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </Paper>
+            <div style={{ paddingTop: "40px" }}>
+              {loading && (
+                <Grid item xs={12}>
+                  <CircularProgress />
+                </Grid>
+              )}
+              {error ? (
+                <Typography color="error">
+                  An error occurred: {error.errorMessage}
+                </Typography>
+              ) : gptResponse ? (
+                <NutritionFacts data={gptResponse} tabIndex={selectedTab} />
+              ) : null}
+            </div>
+          </div>
+        )}
       </Container>
-      <Footer />
+      {/* <Footer /> */}
     </ThemeProvider>
   );
 }

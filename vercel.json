@@ -1,12 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "builds": {
+    "src": "package.json",
+    "functions": "pages/api/**/*.js"
+  },
   "routes": [
-    { "src": "/openai", "dest": "server.js" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/pages/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }

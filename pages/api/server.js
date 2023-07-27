@@ -26,9 +26,11 @@ app.use(express.urlencoded({ extended: false }));
 // add router to the server and name it openai
 app.use('/openai', require('./router'));
 
-if (process.env.DEV === 'true') {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}
+// if (process.env.DEV === 'true') {
+//     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// }
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
 
 // export the express api
 module.exports = app;

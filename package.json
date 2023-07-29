@@ -4,7 +4,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "devserver": "nodemon pages/api/server.js"
+    "devserver": "nodemon server.js"
   },
   "dependencies": {
     "@material-ui/core": "^4.12.4",

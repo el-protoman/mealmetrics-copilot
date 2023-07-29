@@ -60,7 +60,7 @@ function HomePage() {
         serverUrl = "http://localhost:8080"; // Localhost URL for development
       }
       const response = await fetch(
-        "${serverUrl}/openai/generateinfo/recipe",
+        `${serverUrl}/openai/generateinfo/recipe`,
         {
           method: "POST",
           headers: {
@@ -95,7 +95,7 @@ function HomePage() {
         serverUrl = "http://localhost:8080"; // Localhost URL for development
       }
       const response = await fetch(
-        "${serverUrl}/openai/generateinfo/meal",
+        `${serverUrl}/openai/generateinfo/meal`,
         {
           method: "POST",
           headers: {

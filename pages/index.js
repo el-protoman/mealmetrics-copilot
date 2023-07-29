@@ -55,8 +55,12 @@ function HomePage() {
 
   async function getRecipeNutrition() {
     try {
+      let serverUrl = "https://coral-app-foone.ondigitalocean.app"; // Production URL
+      if (process.env.DEV === "true") {
+        serverUrl = "http://localhost:8080"; // Localhost URL for development
+      }
       const response = await fetch(
-        "http://localhost:8080/openai/generateinfo/recipe",
+        "${serverUrl}/openai/generateinfo/recipe",
         {
           method: "POST",
           headers: {
@@ -86,8 +90,12 @@ function HomePage() {
 
   async function getMealRecipe() {
     try {
+      let serverUrl = "https://coral-app-foone.ondigitalocean.app"; // Production URL
+      if (process.env.DEV === "true") {
+        serverUrl = "http://localhost:8080"; // Localhost URL for development
+      }
       const response = await fetch(
-        "http://localhost:8080/openai/generateinfo/meal",
+        "${serverUrl}/openai/generateinfo/meal",
         {
           method: "POST",
           headers: {

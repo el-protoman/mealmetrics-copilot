@@ -11,19 +11,32 @@ Create a component with the following specifications:
 import React from "react";
 import { Typography, Paper } from "@material-ui/core";
 
-const NutritionFacts = ({ data }) => {
+const NutritionFacts = ({ data, tabIndex }) => {
     if (typeof data !== "string") return null;
-    
+
+    let message = "🍎 Nutrition Facts:"
+
     const nutrition = data.split(/\n\n|\n/);
-    
+
+    if (tabIndex === 0) {
+        // Find Nutrition Facts tab
+        message = "🍎 Here's the nutrition facts for your recipe:";
+    } else if (tabIndex === 1) {
+        // Create Meal tab
+        message = "🍎 Here's the instructions for your delicious meal:";
+    } else {
+        // Handle other tab indices here if needed
+        message = "🍎 Nutrition Facts:";
+    }
+
     return (
         <Paper elevation={24} style={{ padding: "20px" }}>
-            <h3> 🍎 Here's the nutrition facts for your recipe:</h3>
-        {nutrition.map((item, index) => (
-            <Typography key={index}>{item}</Typography>
-        ))}
+            <h3> {message} </h3>
+            {nutrition.map((item, index) => (
+                <Typography key={index}>{item}</Typography>
+            ))}
         </Paper>
     );
-    }
+}
 
 export default NutritionFacts;

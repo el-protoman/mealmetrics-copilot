@@ -11,7 +11,7 @@ const openai = new OpenAIApi(configuration);
 
 // Add a 'promptType' parameter to the function
 const generateInfo = async (req, res, promptType) => {
-  const { recipe } = req.body;
+  const { recipe, mealType } = req.body;
 
   try {
     // Use the 'promptType' to determine the appropriate prompt
@@ -21,7 +21,7 @@ const generateInfo = async (req, res, promptType) => {
     if (promptType === 'recipe') {
       prompt = recipePrompt;
     } else if (promptType === 'meal') {
-      prompt = mealPrompt;
+      prompt = mealPrompt.replace("mediterranean", mealType);
       isRecipePrompt = false; // Change this to boolean
     } else {
       // Default to recipePrompt if no valid promptType is provided

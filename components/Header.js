@@ -8,14 +8,20 @@ import {
   Tabs, Tab
 } from "@material-ui/core";
 
-function Header({ selectedTab, handleTabChange }) {
+function Header({ selectedTab, handleTabChange, handleMealTypeChange }) {
   const [anchorEl, setAnchorEl] = useState(null); // Track the anchor element for the menu
+
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (mealType) => {
+    handleMealTypeChange(mealType);  // Call the callback with the selected meal type
+    handleMenuClose();
   };
 
   return (
@@ -47,8 +53,11 @@ function Header({ selectedTab, handleTabChange }) {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          <MenuItem onClick={handleMenuClose}>Menu Item 1</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Menu Item 2</MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("Mediterranean")}>Mediterranean</MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("Paleo")}>Paleo</MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("Vegeterian")}>Vegeterian</MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("Keto")}>Keto</MenuItem>
+          <MenuItem onClick={() => handleMenuItemClick("Gluten Free")}>Gluten Free</MenuItem>
           {/* Add more menu items as needed */}
         </Menu>
       </Toolbar>

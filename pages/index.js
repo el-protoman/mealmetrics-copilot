@@ -43,6 +43,7 @@ import theme from "../utils/theme";
 
 function HomePage() {
   const [recipe, setRecipe] = useState("");
+  const [mealType, setMealType] = useState("Mediterranean");
   const [gptResponse, setGPTResponse] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,10 +52,18 @@ function HomePage() {
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
     setRecipe("")
+    setGPTResponse(""); //  Clears the card of previous data
+    setError("");
   };
 
-  async function getRecipeNutrition() {
+  const handleMealTypeChange = (mealType) => {
+    setMealType(mealType);
+  };
+
+  async function getRecipeNutrition(recipe) {
     try {
+      let requestBody = JSON.stringify({ recipe });
+      console.log(requestBody)
       let serverUrl = "https://coral-app-foone.ondigitalocean.app"; // Production URL
       if (process.env.DEV === "true") {
         serverUrl = "http://localhost:8080"; // Localhost URL for development
@@ -66,7 +75,7 @@ function HomePage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ recipe }),
+          body: requestBody,
         }
       );
 
@@ -88,8 +97,10 @@ function HomePage() {
     }
   }
 
-  async function getMealRecipe() {
+  async function getMealRecipe(recipe) {
     try {
+      let requestBody = JSON.stringify({ recipe, mealType });
+      console.log(requestBody)
       let serverUrl = "https://coral-app-foone.ondigitalocean.app"; // Production URL
       if (process.env.DEV === "true") {
         serverUrl = "http://localhost:8080"; // Localhost URL for development
@@ -101,17 +112,17 @@ function HomePage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ recipe }),
+          body: requestBody,
         }
       );
 
-      // get nutrition info
-      const recipe = await response.json();
+      // get meal info
+      const meal = await response.json();
 
       // display recipe info
-      if (recipe.data) {
-        console.log(recipe);
-        setGPTResponse(recipe.data);
+      if (meal.data) {
+        console.log(meal);
+        setGPTResponse(meal.data);
         setLoading(false);
       } else {
         setError("Unable to get recipe info");
@@ -126,10 +137,13 @@ function HomePage() {
   async function handleSubmit(event) {
     event.preventDefault();
     setLoading(true);
+    const newRecipe = event.target.elements.recipe.value;
+    setRecipe(newRecipe);
+
     if (selectedTab === 0) {
-      await getRecipeNutrition();
+      await getRecipeNutrition(newRecipe);
     } else if (selectedTab === 1) {
-      await getMealRecipe();
+      await getMealRecipe(newRecipe);
     } else if (selectedTab === 2) {
       console.log("Please select tab"); //add additional endpoints here
     }
@@ -142,7 +156,7 @@ function HomePage() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Header selectedTab={selectedTab} handleTabChange={handleTabChange} />
+      <Header selectedTab={selectedTab} handleTabChange={handleTabChange} handleMealTypeChange={handleMealTypeChange} />
       <Container maxWidth="md" style={{ marginTop: "40px", minHeight: "100vh", paddingBottom: "100px" }}>
         {/* Display the content of the selected tab */}
         {selectedTab === 0 && (
@@ -155,6 +169,7 @@ function HomePage() {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextareaAutosize
+                      name="recipe"
                       value={recipe}
                       onChange={(e) => setRecipe(e.target.value)}
                       placeholder="Enter recipe to get nutrition facts"
@@ -214,6 +229,7 @@ function HomePage() {
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextareaAutosize
+                      name="recipe"
                       value={recipe}
                       onChange={(e) => setRecipe(e.target.value)}
                       placeholder="Enter ingredients to get a recipe suggestion"

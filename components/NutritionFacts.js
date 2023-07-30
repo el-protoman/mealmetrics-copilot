@@ -8,15 +8,24 @@ Create a component with the following specifications:
 
 */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, Paper } from "@material-ui/core";
 
 const NutritionFacts = ({ data, tabIndex }) => {
-    if (typeof data !== "string") return null;
+    const [nutritionData, setNutritionData] = useState([]);
+
+    useEffect(() => {
+        setNutritionData([]);
+
+        // Split the data into facts on tab change
+        if (typeof data === "string" && data.trim() !== "") {
+            const nutrition = data.split(/\n\n|\n/);
+            setNutritionData(nutrition);
+        }
+
+    }, [tabIndex]); // Listen for changes in 'tabindex' props
 
     let message = "🍎 Nutrition Facts:"
-
-    const nutrition = data.split(/\n\n|\n/);
 
     if (tabIndex === 0) {
         // Find Nutrition Facts tab
@@ -32,7 +41,7 @@ const NutritionFacts = ({ data, tabIndex }) => {
     return (
         <Paper elevation={24} style={{ padding: "20px" }}>
             <h3> {message} </h3>
-            {nutrition.map((item, index) => (
+            {nutritionData.map((item, index) => (
                 <Typography key={index}>{item}</Typography>
             ))}
         </Paper>

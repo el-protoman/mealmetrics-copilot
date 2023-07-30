@@ -33,7 +33,7 @@ const generateInfo = async (req, res, promptType) => {
     const n = isRecipePrompt ? 1 : 2;
 
     const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4",
       messages: [{ role: "user", content: `${prompt}${recipe}` }],
       max_tokens: 2000,
       temperature,
